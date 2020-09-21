@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>PointerCapture test</title>
+    <style>
+      html {
+        touch-action: none;
+        -webkit-touch-callout:none;
+        -webkit-user-select:none;
+        -moz-user-select:none;
+        -ms-user-select:none;
+        user-select: none;
+      }
+
+      /* #testarea rect { */
+      body div {
+        width: 20%;
+        height: 50px;
+      }
+
+      body div target, body div filler {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      #test1 {
+        /* fill: green; */
+        background-color: green;
+      }
+
+      #test2 {
+        /* fill: gold; */
+        background-color: gold;
+      }
+
+      #test3 {
+        /* fill: red; */
+        background-color: orange;
+      }
+
+      #test4 {
+        /* fill: red; */
+        background-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="test1" class="slider"></div>
+    <div id="test2" class="slider"><target></target></div>
+    <div id="test3" class="slider"><filler></filler></div>
+    <target><div id="test4" class="slider"></div></target>
+    <p>
+      Green is a regular div, <br/>
+      Yellow is a div where a child recieves the event and capture, <br/>
+      Orange is a div where a child recieves the event but not the capture, and it doesn't work, <br/>
+      Red is a div where a parent recieves the capture, and it doesn't work
+    </p>
+    <script type="module">
+      Array.from(document.getElementsByClassName("slider")).forEach(setUpSlider)
+
+      function setUpSlider(element) {
+        element.addEventListener("pointerdown", capture)
+        element.addEventListener("pointermove", hold)
+
+        element.tx = 0
+      }
+
+      let lastX
+
+      function capture(event) {
+        console.log("down on", event.currentTarget)
+        if (event.currentTarget.children[0]?.tagName == "TARGET") {
+          event.currentTarget.children[0].setPointerCapture(event.pointerId)
+        } else if (event.currentTarget.parentElement.tagName == "TARGET") {
+          event.currentTarget.parentElement.setPointerCapture(event.pointerId)
+        } else {
+          event.currentTarget.setPointerCapture(event.pointerId)
+        }
+
+        lastX = event.clientX
+      }
+
+      function hold(event) {
+        let hasCapture = false
+        if (event.currentTarget.children[0]?.tagName == "TARGET") {
+          hasCapture = event.currentTarget.children[0].hasPointerCapture(event.pointerId)
+        } else if (event.currentTarget.parentElement.tagName == "TARGET") {
+          hasCapture = event.currentTarget.parentElement.hasPointerCapture(event.pointerId)
+        } else {
+          hasCapture = event.currentTarget.hasPointerCapture(event.pointerId)
+        }
+        if (hasCapture) {
+          // When the current target has capture, it should always be the main target as well (unless shadow DOMs are involved).
+          console.log("holding on", event.currentTarget, event.target == event.currentTarget)
+
+          event.currentTarget.tx -= lastX - event.clientX
+          event.currentTarget.style.transform = `translate(${event.currentTarget.tx}px, 0)`
+
+          lastX = event.clientX
+        }
+      }
+    </script>
+  </body>
+</html>
