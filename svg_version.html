@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>PointerCapture test</title>
+    <style>
+      html {
+        touch-action: none;
+        -webkit-touch-callout:none;
+        -webkit-user-select:none;
+        -moz-user-select:none;
+        -ms-user-select:none;
+        user-select: none;
+      }
+
+      #testarea rect {
+        width: 20%;
+        height: 50px;
+      }
+
+      #test1 {
+        fill: green;
+      }
+
+      #test2 {
+        fill: gold;
+      }
+
+      #test3 {
+        fill: red;
+      }
+    </style>
+  </head>
+  <body>
+    <svg id="testarea" width="100%" height="500px">
+      <rect id="test1" class="slider" x="0" y="0" transform=""/>
+      <g transform="translate(0, 50)">
+         <rect id="test2" class="slider" x="0" y="0" transform=""/>
+      </g>
+      <g transform="translate(0, 100)">
+         <g id="test3" class="slider" transform="">
+           <rect x="0" y="0"/>
+         </g>
+      </g>
+      <text x="10" y="170">
+        <tspan x="0" dy="0">Green is a rect.</tspan>
+        <tspan x="0" dy="20">Yellow is a rect within a group, with the group static.</tspan>
+        <tspan x="0" dy="20">Red is a rect within a group within a group, with the outermost group static, and it doesnt work.</tspan>
+      </text>
+    </svg>
+    <script type="module">
+      Array.from(document.getElementsByClassName("slider")).forEach(setUpSlider)
+
+      function setUpSlider(element) {
+        element.addEventListener("pointerdown", capture)
+        element.addEventListener("pointermove", hold)
+
+        element.tx = 0
+      }
+
+      let lastX
+
+      function capture(event) {
+        console.log("down on", event.currentTarget)
+        event.currentTarget.setPointerCapture(event.pointerId)
+
+        lastX = event.clientX
+      }
+
+      function hold(event) {
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          // When the current target has capture, it should always be the main target as well (unless shadow DOMs are involved).
+          console.log("holding on", event.currentTarget, event.target == event.currentTarget)
+
+          event.currentTarget.tx -= lastX - event.clientX
+          event.currentTarget.attributes.transform.value = `translate(${event.currentTarget.tx}, 0)`
+
+          lastX = event.clientX
+        }
+      }
+    </script>
+  </body>
+</html>
