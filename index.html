@@ -50,10 +50,13 @@
       How the elements are structured
     </h3>
     <p>
-      Green is a single div that recieves both the initial event and the capture. <br/>
-      Yellow is a div where a child element recieves the initial event and the capture. <br/>
-      Orange is a div where a child element recieves the initial event and the colored element recieves the capture <br/>
-      Red is a div that recieves the initial event and a parent element recieves the capture.
+      All event handlers are on the colored elements. The element structure, the target of the initial event, and the recipient of pointer capture vary in each test case, as described below.
+      <ul>
+        <li> Green is a single div that recieves both the initial event and the capture. </li>
+        <li> Yellow is a div where a child element recieves the initial event and the capture. </li>
+        <li> Orange is a div where a child element recieves the initial event and the colored element recieves the capture </li>
+        <li> Red is a div that recieves the initial event and the parent element recieves the capture. </li>
+      </ul>
     </p>
     <h3>
       What should happen
