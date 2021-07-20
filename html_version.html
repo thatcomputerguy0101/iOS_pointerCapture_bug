@@ -13,7 +13,6 @@
         user-select: none;
       }
 
-      /* #testarea rect { */
       body div {
         width: 20%;
         height: 50px;
@@ -25,37 +24,57 @@
         height: 100%;
       }
 
-      #test1 {
-        /* fill: green; */
+      #greenTest {
         background-color: green;
       }
 
-      #test2 {
-        /* fill: gold; */
+      #yellowTest {
         background-color: gold;
       }
 
-      #test3 {
-        /* fill: red; */
+      #orangeTest {
         background-color: orange;
       }
 
-      #test4 {
-        /* fill: red; */
+      #redTest {
         background-color: red;
       }
     </style>
   </head>
   <body>
-    <div id="test1" class="slider"></div>
-    <div id="test2" class="slider"><target></target></div>
-    <div id="test3" class="slider"><filler></filler></div>
-    <target><div id="test4" class="slider"></div></target>
+    <div id="greenTest" class="slider"></div>
+    <div id="yellowTest" class="slider"><target></target></div>
+    <div id="orangeTest" class="slider"><filler></filler></div>
+    <target><div id="redTest" class="slider"></div></target>
+    <h3>
+      How the elements are structured
+    </h3>
     <p>
-      Green is a regular div, <br/>
-      Yellow is a div where a child recieves the event and capture, <br/>
-      Orange is a div where a child recieves the event but not the capture, and it doesn't work, <br/>
-      Red is a div where a parent recieves the capture, and it doesn't work
+      Green is a single div that recieves both the initial event and the capture. <br/>
+      Yellow is a div where a child element recieves the initial event and the capture. <br/>
+      Orange is a div where a child element recieves the initial event and the colored element recieves the capture <br/>
+      Red is a div that recieves the initial event and a parent element recieves the capture.
+    </p>
+    <h3>
+      What should happen
+    </h3>
+    <p>
+      Green, yellow, and orange should all move with the pointer if the pointer sequence starts on the colored element. <br/>
+      Red should never move.
+    </p>
+    <h3>
+      What does happen
+    </h3>
+    <p>
+      Green and yellow correctly follow the pointer
+      <ul>
+        <li> For green, this means that pointer caputer works correctly in a minimal layout sitution </li>
+        <li> For yellow, this means that pointer capture can be delegated down to whatever element was the target of the initial event </li>
+      </ul>
+      Orange and red follow the pointer if the pointer remains over the colored slider
+      <ul>
+        <li> For orange, this indicates that pointer capture was not recieved, with interference caused by an invisible child. </li>
+        <li> For red, this incicates that pointer capture was not delegated up, with the visible slider causing interference. </li>
     </p>
     <script type="module">
       Array.from(document.getElementsByClassName("slider")).forEach(setUpSlider)
@@ -70,34 +89,53 @@
       let lastX
 
       function capture(event) {
-        console.log("down on", event.currentTarget)
+        console.log(
+          "Down on:", event.currentTarget
+        )
+        // Find the target for the capture, and give it the caputre
         if (event.currentTarget.children[0]?.tagName == "TARGET") {
+          // A child gets the caputre (Yellow test should use this)
           event.currentTarget.children[0].setPointerCapture(event.pointerId)
         } else if (event.currentTarget.parentElement.tagName == "TARGET") {
+          // The parent gets the caputre (Red test should use this)
           event.currentTarget.parentElement.setPointerCapture(event.pointerId)
         } else {
+          // The div itself gets the capture (Green test and Orange test should use this)
           event.currentTarget.setPointerCapture(event.pointerId)
         }
 
+        // Set up movement for next event
         lastX = event.clientX
       }
 
       function hold(event) {
         let hasCapture = false
+        // Find the target element for the capture, and check if it has the capture
         if (event.currentTarget.children[0]?.tagName == "TARGET") {
+          // A child has caputre (Yellow div should use this)
           hasCapture = event.currentTarget.children[0].hasPointerCapture(event.pointerId)
         } else if (event.currentTarget.parentElement.tagName == "TARGET") {
+          // The parent has caputre (This should never happen! Red div will incorrectly use this)
           hasCapture = event.currentTarget.parentElement.hasPointerCapture(event.pointerId)
         } else {
+          // The div itself has capture (Green test and Orange test should use this)
           hasCapture = event.currentTarget.hasPointerCapture(event.pointerId)
         }
+        // If the target element does have capture, the pointer is down and movements should be processed
         if (hasCapture) {
           // When the current target has capture, it should always be the main target as well (unless shadow DOMs are involved).
-          console.log("holding on", event.currentTarget, event.target == event.currentTarget)
+          // Threrefore, second log should be true for Green and Orange, false for Yellow, and never processed by Red
+          console.log(
+            "Holding on:", event.currentTarget,
+            "Is target:", event.target == event.currentTarget,
+            "Is correct:", event.target.id != "redTest" && (event.target.id == "yellowTest") != (event.target == event.currentTarget)
+          )
 
-          event.currentTarget.tx -= lastX - event.clientX
+          // Handle visual movement of the slider
+          event.currentTarget.tx += event.clientX - lastX
           event.currentTarget.style.transform = `translate(${event.currentTarget.tx}px, 0)`
 
+          // Set up movement for next event
           lastX = event.clientX
         }
       }
