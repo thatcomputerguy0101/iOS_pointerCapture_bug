@@ -95,37 +95,40 @@
         console.log(
           "Down on:", event.currentTarget
         )
-        // Find the target for the capture, and give it the caputre
+        let targetElement
+        // Find the target for the capture
         if (event.currentTarget.children[0]?.tagName == "TARGET") {
           // A child gets the caputre (Yellow test should use this)
-          event.currentTarget.children[0].setPointerCapture(event.pointerId)
+          targetElement = event.currentTarget.children[0]
         } else if (event.currentTarget.parentElement.tagName == "TARGET") {
           // The parent gets the caputre (Red test should use this)
-          event.currentTarget.parentElement.setPointerCapture(event.pointerId)
+          targetElement = event.currentTarget.parentElement
         } else {
           // The div itself gets the capture (Green test and Orange test should use this)
-          event.currentTarget.setPointerCapture(event.pointerId)
+          targetElement = event.currentTarget
         }
+        // Give the capture to the selected target
+        targetElement.setPointerCapture(event.pointerId)
 
         // Set up movement for next event
         lastX = event.clientX
       }
 
       function hold(event) {
-        let hasCapture = false
-        // Find the target element for the capture, and check if it has the capture
+        let targetElement
+        // Find the target element for the capture
         if (event.currentTarget.children[0]?.tagName == "TARGET") {
           // A child has caputre (Yellow div should use this)
-          hasCapture = event.currentTarget.children[0].hasPointerCapture(event.pointerId)
+          targetElement = event.currentTarget.children[0]
         } else if (event.currentTarget.parentElement.tagName == "TARGET") {
           // The parent has caputre (This should never happen! Red div will incorrectly use this)
-          hasCapture = event.currentTarget.parentElement.hasPointerCapture(event.pointerId)
+          targetElement = event.currentTarget.parentElement
         } else {
           // The div itself has capture (Green test and Orange test should use this)
-          hasCapture = event.currentTarget.hasPointerCapture(event.pointerId)
+          targetElement = event.currentTarget
         }
-        // If the target element does have capture, the pointer is down and movements should be processed
-        if (hasCapture) {
+        // If the target element has capture, the pointer is down and movements should be processed
+        if (targetElement.hasPointerCapture(event.pointerId)) {
           // When the current target has capture, it should always be the main target as well (unless shadow DOMs are involved).
           // Threrefore, second log should be true for Green and Orange, false for Yellow, and never processed by Red
           console.log(
