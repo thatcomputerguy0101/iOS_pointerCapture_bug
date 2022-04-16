@@ -54,7 +54,7 @@
       <ul>
         <li> Green is a single div that recieves both the initial event and the capture. </li>
         <li> Yellow is a div where a child element recieves the initial event and the capture. </li>
-        <li> Orange is a div where a child element recieves the initial event and the colored element recieves the capture </li>
+        <li> Orange is a div where a child element recieves the initial event and the colored element recieves the capture. </li>
         <li> Red is a div that recieves the initial event and the parent element recieves the capture. </li>
       </ul>
     </p>
@@ -69,12 +69,12 @@
       What does happen
     </h3>
     <p>
-      Green and yellow correctly follow the pointer
+      Green and yellow correctly follow the pointer.
       <ul>
-        <li> For green, this means that pointer caputer works correctly in a minimal layout sitution </li>
-        <li> For yellow, this means that pointer capture can be delegated down to whatever element was the target of the initial event </li>
+        <li> For green, this means that pointer caputer works correctly in a minimal layout sitution. </li>
+        <li> For yellow, this means that pointer capture can be delegated down to whatever element was the target of the initial event. </li>
       </ul>
-      Orange and red follow the pointer if the pointer remains over the colored slider
+      Orange and red follow the pointer if the pointer remains over the colored slider.
       <ul>
         <li> For orange, this indicates that pointer capture was not recieved, with interference caused by an invisible child. </li>
         <li> For red, this incicates that pointer capture was not delegated up, with the visible slider causing interference. </li>
