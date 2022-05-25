@@ -85,6 +85,7 @@
       function setUpSlider(element) {
         element.addEventListener("pointerdown", capture)
         element.addEventListener("pointermove", hold)
+        element.addEventListener("pointerup", release)
 
         element.tx = 0
       }
@@ -143,6 +144,28 @@
 
           // Set up movement for next event
           lastX = event.clientX
+        }
+      }
+
+      function release(event) {
+        let targetElement
+        // Find the target element for the capture
+        if (event.currentTarget.children[0]?.tagName == "TARGET") {
+          // A child has caputre (Yellow div should use this)
+          targetElement = event.currentTarget.children[0]
+        } else if (event.currentTarget.parentElement.tagName == "TARGET") {
+          // The parent has caputre (This should never happen! Red div will incorrectly use this)
+          targetElement = event.currentTarget.parentElement
+        } else {
+          // The div itself has capture (Green test and Orange test should use this)
+          targetElement = event.currentTarget
+        }
+        if (targetElement.hasPointerCapture) {
+          console.log(
+            "Released on:", event.currentTarget,
+            "Is target:", event.target == event.currentTarget,
+            "Is correct:", event.target.id != "redTest" && (event.target.id == "yellowTest") != (event.target == event.currentTarget)
+          )
         }
       }
     </script>
