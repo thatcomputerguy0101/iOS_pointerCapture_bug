@@ -135,7 +135,7 @@
           console.log(
             "Holding on:", event.currentTarget,
             "Is target:", event.target == event.currentTarget,
-            "Is correct:", event.target.id != "redTest" && (event.target.id == "yellowTest") != (event.target == event.currentTarget)
+            "Is correct:", event.currentTarget.id != "redTest" && (event.currentTarget.id == "yellowTest") != (event.target == event.currentTarget)
           )
 
           // Handle visual movement of the slider
@@ -164,7 +164,7 @@
           console.log(
             "Released on:", event.currentTarget,
             "Is target:", event.target == event.currentTarget,
-            "Is correct:", event.target.id != "redTest" && (event.target.id == "yellowTest") != (event.target == event.currentTarget)
+            "Is correct:", event.currentTarget.id != "redTest" && (event.currentTarget.id == "yellowTest") != (event.target == event.currentTarget)
           )
         }
       }
